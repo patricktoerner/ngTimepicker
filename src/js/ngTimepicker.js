@@ -12,7 +12,9 @@ angular.module('jkuri.timepicker', [])
 
 	return {
 		restrict: 'EA',
-		scope: true,
+		scope: {
+          executeOnChange: '&'
+        },
 		require: '?ngModel',
 		link: function (scope, element, attrs, ngModel) {
 			setScopeValues(scope, attrs);
@@ -25,7 +27,7 @@ angular.module('jkuri.timepicker', [])
 				scope.minutes = time[1];
 			};
 
-			var setTime = function () {
+			var setTime = function (init) {
 				var time;
 				if (!scope.showMeridian) {
 					time = scope.hour + ':' + scope.minutes;
@@ -36,6 +38,9 @@ angular.module('jkuri.timepicker', [])
 					scope.viewValue = time + ' ' + scope.meridian;
 					time = convertFromMeridianHour() + ':' + scope.minutes;
 					ngModel.$setViewValue(time);
+				}
+				if(!init){
+					scope.executeOnChange();
 				}
 			};
 
@@ -90,7 +95,7 @@ angular.module('jkuri.timepicker', [])
 					scope.hour = '0' + scope.hour;
 				}
 
-				setTime();
+				setTime(false);
 			};
 
 			scope.decreaseHour = function () {
@@ -113,39 +118,44 @@ angular.module('jkuri.timepicker', [])
 					scope.hour = '0' + scope.hour;
 				}
 
-				setTime();
+				setTime(false);
 			};
 
 			scope.incrementMinutes = function () {
 				scope.minutes = parseInt(scope.minutes, 10) + parseInt(scope.step, 10);
-				if (scope.minutes > 59) {
-					scope.minutes = '00';
-					scope.incrementHour();
-				}
 				if(parseInt(scope.minutes, 10) > 0 && parseInt(scope.minutes, 10) < 10){
 					scope.minutes = '0'+scope.minutes;
 				}
-				setTime();
+				if (scope.minutes > 59) {
+					scope.minutes = '00';
+					scope.incrementHour();
+					setTime(true);
+				}else{
+					setTime(false);
+				}
+
 			};
 
 			scope.decreaseMinutes = function () {
 				scope.minutes = parseInt(scope.minutes, 10) - parseInt(scope.step, 10);
-				if (parseInt(scope.minutes, 10) < 0) {
-					scope.minutes = 60 - parseInt(scope.step, 10);
-					scope.decreaseHour();
-				}
 				if(parseInt(scope.minutes, 10) > 0 && parseInt(scope.minutes, 10) < 10){
 					scope.minutes = '0'+scope.minutes;
 				}
 				if (parseInt(scope.minutes, 10) === 0) {
 					scope.minutes = '00';
 				}
-				setTime();
+				if (parseInt(scope.minutes, 10) < 0) {
+					scope.minutes = 60 - parseInt(scope.step, 10);
+					scope.decreaseHour();
+					setTime(true);
+				}else{
+					setTime(false);
+				}
 			};
 
 			scope.toggleMeridian = function () {
 				scope.meridian = (scope.meridian === 'AM') ? 'PM' : 'AM';
-				setTime();
+				setTime(false);
 			};
 
 			$document.on('click', function (e) {
@@ -157,7 +167,7 @@ angular.module('jkuri.timepicker', [])
             });
 
 			initTime();
-			setTime();
+			setTime(true);
 
 		},
 		template:
