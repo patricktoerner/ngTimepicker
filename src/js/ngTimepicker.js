@@ -8,13 +8,14 @@ angular.module('jkuri.timepicker', [])
 		scope.showMeridian = scope.$eval(attrs.showMeridian) || false;
 		scope.meridian = attrs.meridian || 'AM';
 		scope.theme = attrs.theme || '';
-		scope.isDisabled = scope.$eval(attrs.isDisabled) || false;
+		console.log(scope.isDisabled);
 	};
 
 	return {
 		restrict: 'EA',
 		scope: {
-          executeOnChange: '&'
+          executeOnChange: '&',
+          isDisabled: '='
         },
 		require: '?ngModel',
 		link: function (scope, element, attrs, ngModel) {
