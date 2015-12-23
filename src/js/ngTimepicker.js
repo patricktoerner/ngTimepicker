@@ -8,6 +8,7 @@ angular.module('jkuri.timepicker', [])
 		scope.showMeridian = scope.$eval(attrs.showMeridian) || false;
 		scope.meridian = attrs.meridian || 'AM';
 		scope.theme = attrs.theme || '';
+		scope.isDisabled = scope.$eval(attrs.isDisabled) || false;
 	};
 
 	return {
@@ -171,8 +172,8 @@ angular.module('jkuri.timepicker', [])
 
 		},
 		template:
-		'<input type="text" ng-focus="showTimepicker()" ng-value="viewValue" class="ng-timepicker-input" ng-readonly="true">' +
-		'<div class="ng-timepicker" ng-show="opened" ng-class="{\'red\': theme === \'red\', \'green\': theme === \'green\', \'blue\': theme === \'blue\'}">' +
+		'<input type="text" ng-focus="showTimepicker()" ng-value="viewValue" class="ng-timepicker-input" ng-class="{\'ng-timepicker-disabled\': isDisabled}" ng-readonly="true">' +
+		'<div class="ng-timepicker" ng-if="!isDisabled" ng-show="opened" ng-class="{\'red\': theme === \'red\', \'green\': theme === \'green\', \'blue\': theme === \'blue\'}">' +
 		'  <table>' +
 		'    <tbody>' +
 		'    <tr>' +

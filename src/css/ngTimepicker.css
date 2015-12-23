@@ -18,6 +18,10 @@
 	transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 }
 
+.ng-timepicker-disabled{
+    background-color: #E2E1E1;
+}
+
 .ng-timepicker {
 	display: inline-block;
 	position: absolute;
