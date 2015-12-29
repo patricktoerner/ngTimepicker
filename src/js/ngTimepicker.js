@@ -8,13 +8,25 @@ angular.module('jkuri.timepicker', [])
 		scope.showMeridian = scope.$eval(attrs.showMeridian) || false;
 		scope.meridian = attrs.meridian || 'AM';
 		scope.theme = attrs.theme || '';
+		scope.errors = [];
+		scope.errorText = '';
+		scope.showErrors = false;
+		scope.minKey = attrs.minKey || '';
+		scope.maxKey = attrs.maxKey || '';
+		scope.uniqueId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+		    var r = crypto.getRandomValues(new Uint8Array(1))[0]%16|0, v = c == 'x' ? r : (r&0x3|0x8);
+		    return v.toString(16);
+		});
 	};
 
 	return {
 		restrict: 'EA',
 		scope: {
           executeOnChange: '&',
-          isDisabled: '='
+          isDisabled: '=',
+          minTime: '=',
+          maxTime: '=',
+          errorObject: '='
         },
 		require: '?ngModel',
 		link: function (scope, element, attrs, ngModel) {
@@ -26,6 +38,7 @@ angular.module('jkuri.timepicker', [])
 				var time = scope.initTime.split(':');
 				scope.hour = time[0];
 				scope.minutes = time[1];
+				scope.trueHour = (scope.showMeridian) ? convertFromMeridianHour() : scope.hour;
 			};
 
 			var setTime = function (init) {
@@ -33,17 +46,48 @@ angular.module('jkuri.timepicker', [])
 				if (!scope.showMeridian) {
 					time = scope.hour + ':' + scope.minutes;
 					scope.viewValue = time;
+					scope.trueHour = scope.hour;
 					ngModel.$setViewValue(time);
 				} else {
 					time = scope.hour + ':' + scope.minutes;
 					scope.viewValue = time + ' ' + scope.meridian;
 					time = convertFromMeridianHour() + ':' + scope.minutes;
+					scope.trueHour = convertFromMeridianHour();
 					ngModel.$setViewValue(time);
 				}
 				if(!init){
+					validateTime();
 					scope.executeOnChange();
 				}
 			};
+
+			var validateTime = function(){
+				scope.errors = [];
+				scope.errorObject[scope.uniqueId] = [];
+				scope.showErrors = false;
+				if(scope.minTime){
+					scope.minHour = parseInt(scope.minTime.split(':')[0], 10);
+					scope.minMin = parseInt(scope.minTime.split(':')[1], 10);
+					if( (scope.minHour > parseInt(scope.trueHour, 10))
+						|| (scope.minHour == parseInt(scope.trueHour, 10) && scope.minMin > parseInt(scope.minutes, 10)) ){
+						scope.errors.push("Time must be greater than " + scope.minKey + " (" + scope.minTime + ")");
+						scope.errorObject[scope.uniqueId].push("Time must be greater than " + scope.minKey + " (" + scope.minTime + ")");
+						scope.showErrors = true;
+					}
+				}
+
+				if(scope.maxTime){
+					scope.maxHour = parseInt(scope.maxTime.split(':')[0], 10);
+					scope.maxMin = parseInt(scope.maxTime.split(':')[1], 10);
+					if( (scope.maxHour < parseInt(scope.trueHour, 10))
+						|| (scope.maxHour == parseInt(scope.trueHour, 10) && scope.maxMin < parseInt(scope.minutes, 10)) ){
+						scope.errors.push("Time must be less than " + scope.maxKey + " (" + scope.maxTime + ")");
+						scope.errorObject[scope.uniqueId].push("Time must be less than " + scope.maxKey + " (" + scope.maxTime + ")");
+						scope.showErrors = true;
+					}
+				}
+				scope.errorText = scope.errors.join(" AND ");
+			}
 
 			var convertFromMeridianHour = function () {
 				var hour = parseInt(scope.hour, 10);
@@ -172,7 +216,8 @@ angular.module('jkuri.timepicker', [])
 
 		},
 		template:
-		'<input type="text" ng-focus="showTimepicker()" ng-value="viewValue" class="ng-timepicker-input" ng-class="{\'ng-timepicker-disabled\': isDisabled}" ng-readonly="true">' +
+		'<span></span>'+
+		'<input type="text" tooltip-placement="top" uib-tooltip="{{errorText}}" tooltip-trigger="none" tooltip-is-open="showErrors" ng-focus="showTimepicker()" ng-value="viewValue" class="ng-timepicker-input" ng-class="{\'ng-timepicker-disabled\': isDisabled, \'has-error\': errors.length > 0}" ng-readonly="true">' +
 		'<div class="ng-timepicker" ng-if="!isDisabled" ng-show="opened" ng-class="{\'red\': theme === \'red\', \'green\': theme === \'green\', \'blue\': theme === \'blue\'}">' +
 		'  <table>' +
 		'    <tbody>' +
