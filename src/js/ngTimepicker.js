@@ -1,6 +1,6 @@
 angular.module('jkuri.timepicker', [])
 
-.directive('ngTimepicker', ['$document', function($document) {
+.directive('ngTimepicker', ['$document','$timeout', function($document,$timeout) {
 
 	var setScopeValues = function (scope, attrs) {
 		scope.initTime = attrs.initTime || '11:00';
@@ -34,11 +34,14 @@ angular.module('jkuri.timepicker', [])
 
 			scope.opened = false;
 
+			
+
 			var initTime = function () {
 				var time = scope.initTime.split(':');
 				scope.hour = time[0];
 				scope.minutes = time[1];
 				scope.trueHour = (scope.showMeridian) ? convertFromMeridianHour() : scope.hour;
+				initialValidate();
 			};
 
 			var setTime = function (init) {
@@ -60,6 +63,35 @@ angular.module('jkuri.timepicker', [])
 					scope.executeOnChange();
 				}
 			};
+
+			var setWatches = function(){
+				scope.$watch('minTime', function() {
+				   validateTime();
+				});
+
+				scope.$watch('maxTime', function() {
+				   validateTime();
+				});
+			}
+
+			var initialValidate = function(){
+				// watches timepicker width in order to set tooltips after load
+				var unbindWatch = scope.$watch(
+				    function () { 
+				        return {
+				           width: element[0].querySelector('input').offsetWidth
+				        }
+					},
+					function (obj) {
+						console.log(obj.width);
+						if( obj.width > 0 ){
+							setWatches();
+							unbindWatch();
+						}
+					},
+					true //deep watch
+				);
+			}
 
 			var validateTime = function(){
 				scope.errors = [];
