@@ -83,7 +83,6 @@ angular.module('jkuri.timepicker', [])
 				        }
 					},
 					function (obj) {
-						console.log(obj.width);
 						if( obj.width > 0 ){
 							setWatches();
 							unbindWatch();
