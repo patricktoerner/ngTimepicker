@@ -234,6 +234,10 @@ angular.module('jkuri.timepicker', [])
 				setTime(false);
 			};
 
+			scope.changeStep = function(step){
+				scope.step = step;
+			}
+
 			$document.on('click', function (e) {
 				if (element !== e.target && !element[0].contains(e.target)) {
 				    scope.$apply(function () {
@@ -257,18 +261,21 @@ angular.module('jkuri.timepicker', [])
 		'        <td></td>' +
 		'        <td class="act noselect" ng-click="incrementMinutes()"><i class="fa fa-angle-up"></i></td>' +
 		'        <td class="act noselect" ng-click="toggleMeridian()" ng-show="showMeridian"><i class="fa fa-angle-up"></i></td>' +
+		'		<td><div class="step-select" ng-click="changeStep(1)" ng-class="{\'step-active\': step == 1 }">1</div></td>' +
 		'      </tr>' +
 		'      <tr>' +
 		'        <td><input type="text" ng-model="hour" ng-readonly="true"></td>' +
 		'        <td>:</td>' +
 		'        <td><input type="text" ng-model="minutes" ng-readonly="true"></td>' +
 		'        <td ng-show="showMeridian"><input type="text" ng-model="meridian" ng-readonly="true"></td>' +
+		'		<td><div class="step-select" ng-click="changeStep(3)" ng-class="{\'step-active\': step == 3 }">3</div></td>' +
 		'      </tr>' +
 		'      <tr>' +
 		'        <td class="act noselect" ng-click="decreaseHour()"><i class="fa fa-angle-down"></i></td>' + 
 		'        <td></td>' +
 		'        <td class="act noselect" ng-click="decreaseMinutes()"><i class="fa fa-angle-down"></i></td>' +
 		'        <td class="act noselect" ng-click="toggleMeridian()" ng-show="showMeridian"><i class="fa fa-angle-down"></i></td>' +
+		'		<td><div class="step-select" ng-click="changeStep(5)" ng-class="{\'step-active\': step == 5 }">5</div></td>' +
 		'      </tr>' +
 		'  </table>' +
 		'</div>'

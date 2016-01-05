@@ -24,6 +24,26 @@
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
 }
 
+.step-select{
+	font-size:12px;
+	border-radius: 14px;
+	cursor:pointer;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    margin: 0 0px 0 5px;
+}
+
+.step-select:hover{
+	color:#fff;
+	background-color:#CECECE;
+}
+
+.step-select.step-active{
+	color:#fff;
+	background-color:#428BCA;
+}
+
 .ng-timepicker-disabled{
     background-color: #E2E1E1;
 }
